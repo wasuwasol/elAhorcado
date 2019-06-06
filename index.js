@@ -11,9 +11,24 @@ $(document).ready(function () {
         letraElegida = $('#letraIngresar').val();
         letraElegida = normalizarPalabras(letraElegida);
         chequearLetraIngresada(letraElegida);
+        $('#letraIngresar').val('');
+        chequearVidas();
     });
 
 });
+
+const chequearVidas = function () {
+
+    if (vidas === 0) {
+        console.log('perdiste');
+    }else{
+        if (guiones.indexOf(" __ ") === -1){
+            console.log("Ganaste"); 
+        }
+    }
+    
+}
+
 
 const palabraAlAzar = function () {
     var aleatorio = Math.floor(Math.random() * (listado.length));
@@ -22,15 +37,18 @@ const palabraAlAzar = function () {
 }
 
 const iniciarJuego = function () {
+    guiones = [];
     palabraElegida = palabraAlAzar();
     console.log(palabraElegida);
     palabraElegida = normalizarPalabras(palabraElegida);
     separarPalabraEnGuionesInicial(palabraElegida);
+    vidas = palabraElegida.length + 1;
+    $('#vidas').html(vidas);
 }
 
-const normalizarPalabras = function (palabra) {
+const normalizarPalabras = function (palabraOLetra) {
 
-    palabraElegida = palabra.toUpperCase();
+    let texto = palabraOLetra.toUpperCase();
     let caracteres = {
         "á": "a",
         "é": "e",
@@ -46,9 +64,10 @@ const normalizarPalabras = function (palabra) {
 
     let expresion = /[áéíóúÁÉÍÓÚ"]/; // Declaro la expresion regular
 
-    let palabraResultado = palabraElegida.replace(expresion, function (e) { // Busca en la cadena lo que coincida en la expr.regular, reemplaza y asigno a una variable
+    let palabraResultado = texto.replace(expresion, function (e) { // Busca en la cadena lo que coincida en la expr.regular, reemplaza y asigno a una variable
         
         return caracteres[e];
+
     });
 
     return palabraResultado;
@@ -72,17 +91,23 @@ const colocarLetras = function(palabra) {
 
 
 const chequearLetraIngresada = function (letra) {
-    for (let  i= 0; i < palabraElegida.length; i++) {
-        
-        // if (palabraElegida.indexOf('letra') === -1) {
-        if (palabraElegida[i] === letra) {
-            guiones[i] = letra;
-            colocarLetras(guiones);
-        } else {
-            console.log('letra Incorrecta');
-        }
+    if (palabraElegida.indexOf(letra) === -1) {
+        vidas--;
+        $('#vidas').html(vidas);
+        letrasErroneas.push(letra);
+        $("#letrasErroneas").html(letrasErroneas.join("-"));
+    }else{
 
-    }    
+        for (let  i= 0; i < palabraElegida.length; i++) {
+            
+            if (palabraElegida[i] === letra) {
+                guiones[i] = letra;
+                colocarLetras(guiones);
+            } 
+
+        }  
+
+    }
 
 }
 
